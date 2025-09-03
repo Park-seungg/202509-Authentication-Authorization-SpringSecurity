@@ -5,10 +5,10 @@ import com.back.domain.post.post.entity.Post;
 import java.time.LocalDateTime;
 
 public record PostDto(long id,
-                      LocalDateTime createdDate,
-                      LocalDateTime modifiedDate,
-                      String subject,
-                      String body) {
+                      LocalDateTime createDate,
+                      LocalDateTime modifyDate,
+                      String title,
+                      String content) {
     public PostDto(Post post) {
         this(
                 post.getId(),
