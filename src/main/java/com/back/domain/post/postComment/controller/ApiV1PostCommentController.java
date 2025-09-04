@@ -46,7 +46,7 @@ public class ApiV1PostCommentController {
 
     @Transactional
     @GetMapping("/{id}/delete")
-    public RsData delete(
+    public RsData<PostCommentDto> delete(
             @PathVariable long postId,
             @PathVariable long id
     ) {
@@ -56,6 +56,6 @@ public class ApiV1PostCommentController {
 
         postService.deleteComment(post, postComment);
 
-        return new RsData("200-1", "%d번 댓글이 삭제 되었습니다".formatted(id), new PostCommentDto(postComment));
+        return new RsData<>("200-1", "%d번 댓글이 삭제 되었습니다".formatted(id), new PostCommentDto(postComment));
     }
 }
