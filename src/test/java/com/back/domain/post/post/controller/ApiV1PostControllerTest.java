@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test") // 테스트 환경에서는 test 프로파일을 활성화합니다.
@@ -24,11 +25,11 @@ public class ApiV1PostControllerTest {
     @Autowired
     private MockMvc mvc; // MockMvc를 주입받습니다.
 
-    // 글 쓰기 테스트
+    //글쓰기 테스트
     @Test
     @DisplayName("글 쓰기")
     void t1() throws Exception {
-        // 글 쓰기 요청을 보냅니다.
+        //요청을 보냅니다.
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/posts")
@@ -43,6 +44,8 @@ public class ApiV1PostControllerTest {
                 .andDo(print()); // 응답을 출력합니다.
         // 201 Created 상태코드 검증
         resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("write"))
                 .andExpect(status().isCreated());
     }
 
