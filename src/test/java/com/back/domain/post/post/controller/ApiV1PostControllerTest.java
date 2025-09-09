@@ -228,4 +228,34 @@ public class ApiV1PostControllerTest {
                         title-Size-size must be between 2 and 100
                         """.stripIndent().trim()));
     }
+
+    @Test
+    @DisplayName("글 쓰기, content 누락")
+    void t8() throws Exception {
+        //요청을 보냅니다.
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/posts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "title": "제목",
+                                            "content": ""
+                                        }
+                                        """)
+                )
+                .andDo(print()); // 응답을 출력합니다.
+
+        Post post = postService.findLatest().get();
+
+        // 400 BadRequest 상태코드 검증
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("write"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.msg").value("""
+                        content-NotBlank-must not be blank
+                        content-Size-size must be between 2 and 2000
+                        """.stripIndent().trim()));
+    }
 }
