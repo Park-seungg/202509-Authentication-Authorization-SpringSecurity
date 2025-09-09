@@ -223,7 +223,7 @@ public class ApiV1PostControllerTest {
                 .andExpect(handler().methodName("write"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.resultCode").value("400-1"))
-                .andExpect(jsonPath("$.msg").value(""));
+                .andExpect(jsonPath("$.msg").value("제목은 필수 항목입니다."));
     }
 
 }
