@@ -217,13 +217,15 @@ public class ApiV1PostControllerTest {
 
         Post post = postService.findLatest().get();
 
-        // 201 Created 상태코드 검증
+        // 400 BadRequest 상태코드 검증
         resultActions
                 .andExpect(handler().handlerType(ApiV1PostController.class))
                 .andExpect(handler().methodName("write"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.resultCode").value("400-1"))
-                .andExpect(jsonPath("$.msg").value("제목은 필수 항목입니다."));
+                .andExpect(jsonPath("$.msg").value("""
+                        title-NotBlank-must not be blank
+                        title-Size-size must be between 2 and 100
+                        """.stripIndent().trim()));
     }
-
 }
