@@ -13,6 +13,6 @@ public record RsData<T>(
     }
 
     public RsData(String resultCode, String msg, T data) {
-        this(resultCode, Integer.parseInt(resultCode.split("-", 2)[0]), "", data);
+        this(resultCode, Integer.parseInt(resultCode.split("-", 2)[0]), msg, data);
     }
 }
