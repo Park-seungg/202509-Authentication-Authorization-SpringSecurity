@@ -191,13 +191,10 @@ public class ApiV1PostControllerTest {
                 )
                 .andDo(print()); // 응답을 출력합니다.
 
-        Post post = postService.findById(id);
-
         // 200 Ok 상태코드 검증
         resultActions
-                .andExpect(status().isOk())
+                .andExpect(status().isNotFound())
                 .andExpect(handler().handlerType(ApiV1PostController.class))
-                .andExpect(handler().methodName("getItem"))
-                .andExpect(status().isNotFound());
+                .andExpect(handler().methodName("getItem"));
     }
 }
