@@ -15,9 +15,7 @@ public class PostService {
     private final PostRepository postRepository;
 
     public Post findByTitle(String title) {
-        return postRepository.findByTitle(title).orElseThrow(
-                () -> new RuntimeException("게시글이 존재하지 않습니다.")
-        );
+        return postRepository.findByTitle(title).get();
     }
 
     public long count() {
