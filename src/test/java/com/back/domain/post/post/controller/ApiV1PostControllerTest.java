@@ -197,4 +197,33 @@ public class ApiV1PostControllerTest {
                 .andExpect(handler().handlerType(ApiV1PostController.class))
                 .andExpect(handler().methodName("getItem"));
     }
+
+    @Test
+    @DisplayName("글 쓰기, title 누락")
+    void t7() throws Exception {
+        //요청을 보냅니다.
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/posts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "title": "",
+                                            "content": "내용"
+                                        }
+                                        """)
+                )
+                .andDo(print()); // 응답을 출력합니다.
+
+        Post post = postService.findLatest().get();
+
+        // 201 Created 상태코드 검증
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("write"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.resultCode").value("400-1"))
+                .andExpect(jsonPath("$.msg").value(""));
+    }
+
 }
