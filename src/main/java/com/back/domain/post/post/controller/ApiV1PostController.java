@@ -54,8 +54,8 @@ public class ApiV1PostController {
         Post post = postService.create(form.title(), form.content());
 
         return new RsData<>(
-                "200-1",
-                "%d번 게시글이 작성되었습니다.".formatted(post.getId()),
+                "201-1",
+                "%d번 게시글이 생성되었습니다.".formatted(post.getId()),
                 new PostDto(post)
         );
     }
