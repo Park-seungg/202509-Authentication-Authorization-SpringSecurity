@@ -1,4 +1,4 @@
-package com.back.global.globalExceptionHandler;
+package com.back.global.initData.golbalExceptionHandler;
 
 import com.back.global.rsData.RsData;
 import org.springframework.http.ResponseEntity;
