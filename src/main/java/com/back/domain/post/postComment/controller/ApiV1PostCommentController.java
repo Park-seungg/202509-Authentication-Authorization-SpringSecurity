@@ -7,6 +7,8 @@ import com.back.domain.post.postComment.dto.PostCommentModifyReqBody;
 import com.back.domain.post.postComment.dto.PostCommentWriteReqBody;
 import com.back.domain.post.postComment.entity.PostComment;
 import com.back.global.rsData.RsData;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,15 +19,20 @@ import java.util.List;
 @RequestMapping("/api/v1/posts/{postId}/comments")
 @RequiredArgsConstructor
 @RestController
+@Tag(name="ApiV1PostCommentController", description = "API 댓글 컨트롤러")
 public class ApiV1PostCommentController {
     private final PostService postService;
 
     @Transactional(readOnly = true)
     @GetMapping
-    public List<PostCommentDto> getItems(@PathVariable Long postId) {
+    @Operation(summary = "다건 조회")
+    public List<PostCommentDto> getItems(
+            @PathVariable long postId
+    ) {
         Post post = postService.findById(postId);
 
-        return post.getComments()
+        return post
+                .getComments()
                 .stream()
                 .map(PostCommentDto::new)
                 .toList();
@@ -33,6 +40,7 @@ public class ApiV1PostCommentController {
 
     @Transactional(readOnly = true)
     @GetMapping("/{id}")
+    @Operation(summary = "단건 조회")
     public PostCommentDto getItem(
             @PathVariable long postId,
             @PathVariable long id
@@ -46,6 +54,7 @@ public class ApiV1PostCommentController {
 
     @Transactional
     @DeleteMapping("/{id}")
+    @Operation(summary = "삭제")
     public RsData<Void> delete(
             @PathVariable long postId,
             @PathVariable long id
@@ -56,11 +65,12 @@ public class ApiV1PostCommentController {
 
         postService.deleteComment(post, postComment);
 
-        return new RsData<>("200-1", "%d번 댓글이 삭제 되었습니다".formatted(id));
+        return new RsData<>("200-1","%d번 댓글이 삭제되었습니다.".formatted(id));
     }
 
     @Transactional
     @PutMapping("/{id}")
+    @Operation(summary = "수정")
     public RsData<Void> modify(
             @PathVariable long postId,
             @PathVariable long id,
@@ -80,6 +90,7 @@ public class ApiV1PostCommentController {
 
     @Transactional
     @PostMapping
+    @Operation(summary = "작성")
     public RsData<PostCommentDto> write(
             @PathVariable long postId,
             @Valid @RequestBody PostCommentWriteReqBody reqBody
