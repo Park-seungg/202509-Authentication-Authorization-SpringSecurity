@@ -22,7 +22,7 @@ public class ApiV1PostController {
     private final PostService postService;
 
     @Transactional(readOnly = true)
-    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @GetMapping
     public List<PostDto> getItems() {
         List<Post> items = postService.getList();
 
@@ -33,7 +33,7 @@ public class ApiV1PostController {
     }
 
     @Transactional(readOnly = true)
-    @GetMapping(value ="/{id}", produces = APPLICATION_JSON_VALUE)
+    @GetMapping("/{id}")
     public PostDto getItem(@PathVariable Long id) {
         Post item = postService.findById(id);
 
