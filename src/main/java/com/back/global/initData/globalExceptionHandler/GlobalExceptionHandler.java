@@ -1,13 +1,14 @@
-package com.back.global.initData.golbalExceptionHandler;
+package com.back.global.initData.globalExceptionHandler;
 
 import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Comparator;
 import java.util.NoSuchElementException;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<RsData<Void>> handle(NoSuchElementException e) {
@@ -55,17 +56,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 new RsData<>(
                         "400-1",
-                        "JSON 형식이 올바르지 않습니다."
+                        "요청 본문 형식이 올바르지 않습니다."
                 ),
                 BAD_REQUEST
         );
     }
-
     @ExceptionHandler(ServiceException.class)
-    public ResponseEntity<RsData<Void>> handle(ServiceException e) {
-        return new ResponseEntity<>(
-                e.getRsData(),
-                BAD_REQUEST
-        );
+    public RsData<Void> handle(ServiceException e, HttpServletResponse response) {
+        RsData<Void>  rsData = e.getRsData();
+
+        response.setStatus(rsData.statusCode());
+
+        return rsData;
     }
+
 }
