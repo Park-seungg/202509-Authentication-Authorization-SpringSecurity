@@ -95,7 +95,7 @@ public class MemberControllerTest {
                 .andExpect(jsonPath("$.data.item.id").value(member.getId()))
                 .andExpect(jsonPath("$.data.item.createDate").value(Matchers.startsWith(member.getCreateDate().toString().substring(0, 25))))
                 .andExpect(jsonPath("$.data.item.modifyDate").value(Matchers.startsWith(member.getModifyDate().toString().substring(0, 25))))
-                .andExpect(jsonPath("$.data.item.name").value(member.getName()))
+                .andExpect(jsonPath("$.data.item.nickname").value(member.getNickname()))
                 .andExpect(jsonPath("$.data.apiKey").value(member.getApiKey()));
     }
 }
