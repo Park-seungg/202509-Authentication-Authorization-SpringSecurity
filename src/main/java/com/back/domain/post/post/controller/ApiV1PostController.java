@@ -25,7 +25,7 @@ import java.util.List;
 @Validated
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
-@Tag(name = "ApiV1PostController", description = "API 글 컨트롤러")
+@Tag(name="ApiV1PostController", description = "API 글 컨트롤러")
 public class ApiV1PostController {
     private final PostService postService;
     private final MemberService memberService;
@@ -54,7 +54,16 @@ public class ApiV1PostController {
     @Transactional
     @DeleteMapping("/{id}")
     @Operation(summary = "삭제")
-    public RsData<PostDto> delete(@PathVariable Long id) {
+    public RsData<PostDto> delete(
+            @PathVariable Long id,
+            @NotBlank @Size(min = 2, max = 50) @RequestHeader("Authorization") String authorization
+    ) {
+        String apiKey = authorization.replace("Bearer ", "");
+
+        Member author = memberService.findByApiKey(apiKey)
+                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 회원입니다."));
+
+
         Post post = postService.findById(id);
 
         postService.delete(post);
