@@ -7,24 +7,19 @@ import com.back.domain.post.post.dto.PostModifyReqBody;
 import com.back.domain.post.post.dto.PostWriteReqBody;
 import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.service.PostService;
-import com.back.domain.post.postComment.entity.PostComment;
 import com.back.global.Rq.Rq;
 import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController // @Controller + @ResponseBody
-@Validated
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 @Tag(name="ApiV1PostController", description = "API 글 컨트롤러")
@@ -39,6 +34,7 @@ public class ApiV1PostController {
     public List<PostDto> getItems() {
         System.out.println("memberService : " + memberService);
         System.out.println("rq : " + rq);
+
         List<Post> items = postService.getList();
 
         return items
@@ -59,41 +55,31 @@ public class ApiV1PostController {
     @Transactional
     @DeleteMapping("/{id}")
     @Operation(summary = "삭제")
-    public RsData<Void> delete(
-            @PathVariable long postId,
-            @PathVariable long id,
-            @NotBlank @Size(min = 2, max = 50) @RequestHeader("Authorization") String authorization
+    public RsData<PostDto> delete(
+            @PathVariable Long id
     ) {
-        String apiKey = authorization.replace("Bearer ", "");
+        Member actor = rq.getActor();
 
-        Member author = memberService.findByApiKey(apiKey)
-                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 회원입니다."));
+        Post post = postService.findById(id);
 
-
-        Post post = postService.findById(postId);
-
-        PostComment postComment = post.findCommentById(id).get();
-
-        if (!author.equals(postComment.getAuthor())) {
-            throw new ServiceException("403-1", "댓글 삭제 권한이 없습니다.");
+        if (!actor.equals(post.getAuthor())) {
+            throw new ServiceException("403-1", "글 삭제 권한이 없습니다.");
         }
 
-        postService.deleteComment(post, postComment);
+        postService.delete(post);
 
-        return new RsData<>("200-1","%d번 댓글이 삭제되었습니다.".formatted(id));
+        return new RsData<>("200-1", "%d번 게시글이 삭제되었습니다.".formatted(id), new PostDto(post));
     }
 
     @PostMapping
     @Transactional
     @Operation(summary = "작성")
     public RsData<PostDto> write(
-            @Valid @RequestBody PostWriteReqBody reqBody,
-            @NotBlank @Size(min = 2, max = 50) @RequestHeader("Authorization") String authorization
+            @Valid @RequestBody PostWriteReqBody reqBody
     ) {
-        System.out.println("rq.getActor: " + rq.getActor());
 
-        Member author = rq.getActor();
-        Post post = postService.create(author, reqBody.title(), reqBody.content());
+        Member actor = rq.getActor();
+        Post post = postService.create(actor, reqBody.title(), reqBody.content());
 
         return new RsData<>(
                 "201-1",
@@ -107,19 +93,14 @@ public class ApiV1PostController {
     @Operation(summary = "수정")
     public RsData<Void> modify(
             @PathVariable long id,
-            @Valid @RequestBody PostModifyReqBody reqBody,
-            @NotBlank @Size(min = 2, max = 50) @RequestHeader("Authorization") String authorization
-
+            @Valid @RequestBody PostModifyReqBody reqBody
     ) {
-        String apiKey = authorization.replace("Bearer ", "");
-
-        Member author = memberService.findByApiKey(apiKey)
-                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 회원입니다."));
+        Member actor = rq.getActor();
 
         Post post = postService.findById(id);
         postService.update(post, reqBody.title(), reqBody.content());
 
-        if (!author.equals(post.getAuthor())) {
+        if (!actor.equals(post.getAuthor())) {
             throw new ServiceException("403-1", "글 수정 권한이 없습니다.");
         }
 
