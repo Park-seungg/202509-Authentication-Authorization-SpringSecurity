@@ -59,9 +59,7 @@ public class ApiV1PostController {
 
         Post post = postService.findById(id);
 
-        if (!actor.equals(post.getAuthor())) {
-            throw new ServiceException("403-1", "글 삭제 권한이 없습니다.");
-        }
+        post.checkActorCanModify(actor);
 
         postService.delete(post);
 
@@ -97,9 +95,7 @@ public class ApiV1PostController {
         Post post = postService.findById(id);
         postService.update(post, reqBody.title(), reqBody.content());
 
-        if (!actor.equals(post.getAuthor())) {
-            throw new ServiceException("403-1", "글 수정 권한이 없습니다.");
-        }
+        post.checkActorCanDelete(actor);
 
         return new RsData<>(
                 "200-1",
