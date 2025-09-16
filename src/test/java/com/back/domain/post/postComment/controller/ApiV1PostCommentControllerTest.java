@@ -100,12 +100,17 @@ public class ApiV1PostCommentControllerTest {
         long postId = 1;
         long id = 1;
 
+        Post beforePost = postService.findById(postId);
+        String apiKey = beforePost.getAuthor().getApiKey();
+
         //요청을 보냅니다.
         ResultActions resultActions = mvc
                 .perform(
                         delete("/api/v1/posts/%d/comments/%d".formatted(postId, id))
+                                .header("Authorization", "Bearer " + apiKey)
                 )
                 .andDo(print()); // 응답을 출력합니다.
+
 
         // 200 Ok 상태코드 검증
         resultActions
@@ -122,11 +127,15 @@ public class ApiV1PostCommentControllerTest {
         long postId = 1;
         long id = 1;
 
+        Post beforePost = postService.findById(postId);
+        String apiKey = beforePost.getAuthor().getApiKey();
+
         //요청을 보냅니다.
         ResultActions resultActions = mvc
                 .perform(
                         put("/api/v1/posts/%d/comments/%d".formatted(postId, id))
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header("Authorization", "Bearer " + apiKey)
                                 .content("""
                                         {
                                             "content": "내용 new"
@@ -151,7 +160,6 @@ public class ApiV1PostCommentControllerTest {
         long postId = 1;
 
         Post beforePost = postService.findById(postId);
-
         String apiKey = beforePost.getAuthor().getApiKey();
 
         //요청을 보냅니다.

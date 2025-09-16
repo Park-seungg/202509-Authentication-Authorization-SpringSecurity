@@ -7,6 +7,7 @@ import com.back.domain.post.post.dto.PostModifyReqBody;
 import com.back.domain.post.post.dto.PostWriteReqBody;
 import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.service.PostService;
+import com.back.domain.post.postComment.entity.PostComment;
 import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,8 +55,9 @@ public class ApiV1PostController {
     @Transactional
     @DeleteMapping("/{id}")
     @Operation(summary = "삭제")
-    public RsData<PostDto> delete(
-            @PathVariable Long id,
+    public RsData<Void> delete(
+            @PathVariable long postId,
+            @PathVariable long id,
             @NotBlank @Size(min = 2, max = 50) @RequestHeader("Authorization") String authorization
     ) {
         String apiKey = authorization.replace("Bearer ", "");
@@ -64,11 +66,17 @@ public class ApiV1PostController {
                 .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 회원입니다."));
 
 
-        Post post = postService.findById(id);
+        Post post = postService.findById(postId);
 
-        postService.delete(post);
+        PostComment postComment = post.findCommentById(id).get();
 
-        return new RsData<>("200-1", "%d번 게시글이 삭제되었습니다.".formatted(id), new PostDto(post));
+        if (!author.equals(postComment.getAuthor())) {
+            throw new ServiceException("403-1", "댓글 삭제 권한이 없습니다.");
+        }
+
+        postService.deleteComment(post, postComment);
+
+        return new RsData<>("200-1","%d번 댓글이 삭제되었습니다.".formatted(id));
     }
 
     @PostMapping
