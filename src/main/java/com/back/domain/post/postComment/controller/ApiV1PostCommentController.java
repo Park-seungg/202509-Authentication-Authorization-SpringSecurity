@@ -12,6 +12,8 @@ import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -96,11 +98,15 @@ public class ApiV1PostCommentController {
     @Operation(summary = "작성")
     public RsData<PostCommentDto> write(
             @PathVariable long postId,
-            @Valid @RequestBody PostCommentWriteReqBody reqBody
+            @Valid @RequestBody PostCommentWriteReqBody reqBody,
+             @NotBlank @Size(min = 2, max = 50) @RequestHeader("Authorization") String authorization
     ) {
+        String apiKey = authorization.replace("Bearer ", "");
+        Member author = memberService.findByApiKey(apiKey)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
         Post post = postService.findById(postId);
 
-        Member author = memberService.findByUsername("user1").get();
         PostComment postComment = postService.writeComment(author, post, reqBody.content());
 
         // 트렌잭션 끝난 후 수행되야 하는 더티체킹 및 여가지 작업들을 지금 당장 수행시킴
