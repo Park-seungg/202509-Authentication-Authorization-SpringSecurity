@@ -69,14 +69,9 @@ public class ApiV1MemberController {
     }
 
     @DeleteMapping("/logout")
-    public RsData<Void> logout(HttpServletResponse response) {
+    public RsData<Void> logout() {
 
-        Cookie cookie  = new Cookie("apiKey", "");
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
-
-        response.addCookie(cookie);
+        rq.deleteCookie("apiKey");
 
         return new RsData<>(
                 "200-1",
