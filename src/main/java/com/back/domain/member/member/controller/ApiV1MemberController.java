@@ -46,8 +46,11 @@ public class ApiV1MemberController {
         if (!member.getPassword().equals(reqBody.password())) {
             throw new ServiceException("401-2", "비밀번호가 일치하지 않습니다.");
         }
-
-        response.addCookie(new Cookie("apiKey", member.getApiKey()));
+        // 쿠키에 ApiKey 저장
+        Cookie cookie = new Cookie("apiKey", member.getApiKey());
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
 
         return new RsData<>(
                 "200-1",
