@@ -18,8 +18,9 @@ public class AuthTokenService {
     String genAccessToken(Member member) {
         long id = member.getId();
         String username = member.getUsername();
+        String nickname = member.getNickname();
 
-        Map<String, Object> claims = Map.of("id", id, "username", username);
+        Map<String, Object> claims = Map.of("id", id, "username", username, "nickname", nickname);
 
         return Ut.jwt.toString(
                 jwtSecretKey,
@@ -37,7 +38,8 @@ public class AuthTokenService {
         long id = ((Number) parsedPayload.get("id")).longValue();
 
         String username = (String) parsedPayload.get("username");
+        String nickname = (String) parsedPayload.get("nickname");
 
-        return Map.of("id", id, "username", username);
+        return Map.of("id", id, "username", username, "nickname", nickname);
     }
 }
