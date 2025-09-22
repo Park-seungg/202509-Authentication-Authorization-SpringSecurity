@@ -6,6 +6,7 @@ import com.back.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 public class MemberService {
     private final AuthTokenService authTokenService;
     private final MemberRepository memberRepository;
+
     public long count() {
         return memberRepository.count();
     }
@@ -47,5 +49,9 @@ public class MemberService {
 
     public Optional<Member> findById(long id) {
         return memberRepository.findById(id);
+    }
+
+    public List<Member> findAll() {
+        return memberRepository.findAll();
     }
 }
