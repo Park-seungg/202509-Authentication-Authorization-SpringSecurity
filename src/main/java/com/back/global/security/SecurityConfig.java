@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private CustomAuthenticationFilter customAuthenticationFilter;
+    private final CustomAuthenticationFilter customAuthenticationFilter;
 
     @Bean
     PasswordEncoder passwordEncoder() {
