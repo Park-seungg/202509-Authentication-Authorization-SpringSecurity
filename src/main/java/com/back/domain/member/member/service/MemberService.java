@@ -14,7 +14,6 @@ import java.util.Optional;
 public class MemberService {
     private final AuthTokenService authTokenService;
     private final MemberRepository memberRepository;
-
     public long count() {
         return memberRepository.count();
     }
@@ -44,5 +43,9 @@ public class MemberService {
 
     public Map<String, Object> payload(String accessToken) {
         return authTokenService.payload(accessToken);
+    }
+
+    public Optional<Member> findById(long id) {
+        return memberRepository.findById(id);
     }
 }

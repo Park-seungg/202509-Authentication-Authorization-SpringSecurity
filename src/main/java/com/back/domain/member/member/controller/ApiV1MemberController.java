@@ -68,11 +68,14 @@ public class ApiV1MemberController {
     @GetMapping("/me")
     public RsData<MemberDto> me() {
         Member actor = rq.getActor();
+        // 실시간성을 보장하기위해 DB 조회
+        Member member = memberService.findById(actor.getId())
+                .orElseThrow(() -> new ServiceException("404-1", "회원을 찾을 수 없습니다."));
 
-        return new RsData(
+        return new RsData<>(
                 "200-1",
                 "%s님 정보입니다.".formatted(actor.getNickname()),
-                new MemberDto(actor)
+                new MemberDto(member)
         );
     }
 
