@@ -13,13 +13,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final CustomAuthenticationFilter customAuthenticationFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("favicon.ico").permitAll()
                                 .requestMatchers("/h2-console/**").permitAll()
-                                .requestMatchers("/api/*/adm/*").hasRole("ADMIN") // 관리자 권한 체크(선언적으로 인가 처리)
+                                .requestMatchers("/api/*/adm/**").hasRole("ADMIN") // 관리자 권한 체크(선언적으로 인가 처리)
                                 .requestMatchers("/**").permitAll()
                                 .anyRequest().authenticated()
                 )
@@ -31,7 +32,26 @@ public class SecurityConfig {
                 ).csrf(
                         AbstractHttpConfigurer::disable
                 )
-                .addFilterBefore(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(
+                        exceptionHandling -> exceptionHandling
+                                .accessDeniedHandler(
+                                        (request, response, accessDeniedException) -> {
+                                            response.setContentType("application/json;charset=UTF-8");
+
+                                            response.setStatus(403);
+                                            response.getWriter().write(
+                                                    """
+                                                            {
+                                                                 "resultCode": "403-1",
+                                                                 "msg": "권한이 없습니다."
+                                                            }
+                                                            """
+                                            );
+                                        }
+                                )
+                )
+        ;
 
         return http.build();
     }
