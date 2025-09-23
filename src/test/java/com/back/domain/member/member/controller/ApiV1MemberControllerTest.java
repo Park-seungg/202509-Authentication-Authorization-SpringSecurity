@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -20,7 +21,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -101,9 +101,10 @@ public class ApiV1MemberControllerTest {
                 .andExpect(jsonPath("$.data.apiKey").value(member.getApiKey()))
                 .andExpect(jsonPath("$.data.accessToken").isNotEmpty());
 
+
         resultActions.andExpect(
                 result -> {
-                    Cookie apiKeyCookie = result.getResponse().getCookie("apiKey");
+                    Cookie apiKeyCookie= result.getResponse().getCookie("apiKey");
                     assertThat(apiKeyCookie.getValue()).isEqualTo(member.getApiKey()); // 실제 apiKey 값 비교
                     assertThat(apiKeyCookie.getPath()).isEqualTo("/");
                     assertThat(apiKeyCookie.getAttribute("HttpOnly")).isEqualTo("true");
@@ -112,21 +113,17 @@ public class ApiV1MemberControllerTest {
                     assertThat(accessTokenCookie.getValue()).isNotBlank();
                     assertThat(accessTokenCookie.getPath()).isEqualTo("/");
                     assertThat(accessTokenCookie.getAttribute("HttpOnly")).isEqualTo("true");
-
                 }
         );
     }
 
     @Test
     @DisplayName("내 정보")
+    @WithUserDetails("user1")
     void t3() throws Exception {
-        Member actor =  memberService.findByUsername("user1").get();
-        String apiKey = actor.getApiKey();
-
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/v1/members/me")
-                                .header("Authorization", "Bearer " + apiKey)
                 )
                 .andDo(print());
 
@@ -147,14 +144,12 @@ public class ApiV1MemberControllerTest {
 
     @Test
     @DisplayName("내 정보, with apiKey Cookie")
+    @WithUserDetails("user1")
     void t4() throws Exception {
-        Member actor =  memberService.findByUsername("user1").get();
-        String apiKey = actor.getApiKey();
 
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/v1/members/me")
-                                .cookie(new Cookie("apiKey", apiKey))
                 )
                 .andDo(print());
 
@@ -172,6 +167,7 @@ public class ApiV1MemberControllerTest {
                 .andExpect(jsonPath("$.data.modifyDate").value(Matchers.startsWith(member.getModifyDate().toString().substring(0, 25))))
                 .andExpect(jsonPath("$.data.nickname").value(member.getNickname()));
     }
+
 
     @Test
     @DisplayName("로그아웃")

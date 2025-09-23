@@ -60,7 +60,7 @@ public class ApiV1PostController {
 
         Post post = postService.findById(id);
 
-        post.checkActorCanModify(actor);
+        post.checkActorCanDelete(actor);
 
         postService.delete(post);
 
@@ -96,7 +96,7 @@ public class ApiV1PostController {
         Post post = postService.findById(id);
         postService.update(post, reqBody.title(), reqBody.content());
 
-        post.checkActorCanDelete(actor);
+        post.checkActorCanModify(actor);
 
         return new RsData<>(
                 "200-1",
