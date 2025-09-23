@@ -32,6 +32,7 @@ public class HomeController {
     }
 
     @GetMapping(value="/test/fetchPosts", produces = TEXT_HTML_VALUE)
+    @Operation(summary = "fetch 테스트 페이지")
     public String testFetchPosts() {
 
         return """
